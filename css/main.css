@@ -194,10 +194,10 @@ body {
 	display: block;
 	position: relative;
 	width: 90%;
-	margin: 10px auto;
+	margin: 50px auto;
 
 	text-align: left;
-	font-size: 14px;
+	font-size: 18px;
 	font-family: monospace;
 	line-height: 1.2em;
 
@@ -208,6 +208,8 @@ body {
 
 .reveal code {
 	font-family: monospace;
+	padding: 40px;
+	background: #222;
 }
 
 .reveal small {

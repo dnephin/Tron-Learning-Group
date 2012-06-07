@@ -15,7 +15,8 @@
 	
 	<link rel="stylesheet" href="css/reset.css">
 	<link rel="stylesheet" href="css/main.css">
-	<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+    <link rel="stylesheet/less" href="css/tron.css" type="text/css">
+    <script src="js/less-1.3.0.min.js" type="text/javascript"></script>    
 
 	<link rel="stylesheet" href="lib/zenburn.css">
 </head>
@@ -35,18 +36,19 @@
     <h4 class="fragment">and why code should be beautiful</h4>
 </section>
 
-<section>
-    <!-- grid -->
-    <img src="imgs/apache.gif" />
-    <img src="imgs/github.gif" />
-    <div class="est">EST 2009</div>
-    <img src="imgs/yelp.png" />
-    <img src="imgs/python.gif" />
-    <img src="imgs/twisted.gif" />
-    <img src="imgs/yaml.gif" />
-    <img src="" /> <!-- Used by developers at yelp -->
-    <div class="loc">15k loc</div>
-    <img src="" /> <!-- no mascot -->
+<section id="image_grid">
+    <div class="container">
+        <!-- grid -->
+        <div><img src="imgs/apache.png" /></div>
+        <div><img src="imgs/github.png" /></div>
+        <div class="est">EST 2009</div>
+        <div><img src="imgs/yelp.png" /></div>
+        <div><img src="imgs/python.png" /></div>
+        <div><img src="imgs/twisted.png" /></div>
+        <div><img src="imgs/yaml.png" /></div>
+        <div class="loc">15k loc</div>
+        <div><img src="" /></div> <!-- no mascot -->
+    </div>
 </section>
 
 
@@ -122,7 +124,25 @@
 
 <section>
     <h2>State Machine</h2>
-    <!-- example of the erronous code -->
+
+    <pre class="fragment"><code>
+def mark_success(self):
+    self.exit_status = 0
+    self.end_time = timeutils.current_time()
+    self.machine.transition('success')
+    </code></pre>
+
+    <pre class="fragment"><code>
+def success(self):
+    if self.machine.transition('success'):
+        self.exit_status = 0
+        self.end_time    = timeutils.current_time()
+        return True
+    </code></pre>
+</section>
+
+<section>
+    <h2>Networking</h2>
 </section>
 
 <section>
@@ -156,7 +176,7 @@
 
 <section>
     <h2>So what's the deal?</h2>
-    <p>Code should be beautiful!</p>
+    <p class="fragment">Code should be beautiful!</p>
     <p class="fragment">Not convinced?</p>
 </section>
 
@@ -175,11 +195,26 @@
 
 <section>
     <h2>Zen of Python</h2>
+    <pre id="zen">
+>>> import this
+The Zen of Python, by Tim Peters
+
+Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+...</pre>
 </section>
 
-<section>
+<section id="analogy">
     <h2>An Analogy</h2>
     <!-- shark vs broken windows -->
+    <img class="fragment" src="imgs/shark.png" />
+    <div class="fragment">+</div>
+    <img class="fragment" src="imgs/broken_windows.png" />
 </section>
 
 <section>
@@ -217,12 +252,19 @@
 
 <section>
     <h2>Design Patterns</h2>
+    <!-- code to an interface -->
 </section>
 
 
 <section>
     <h2>Tests</h2>
     <!-- before code, synchronously -->
+</section>
+
+
+<section>
+    <h2>Keep it short</h2>
+    <!-- portability, maintainability, understanding -->
 </section>
 
 
