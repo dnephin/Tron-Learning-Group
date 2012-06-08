@@ -1,7 +1,16 @@
 
 
+#slide_title {
+	h1 {
+		margin: 150px auto;
+		font-family: 'Port Lligat Sans';
+	}
+	h3 {
+	}
+}
 
-#image_grid {
+
+#slide_image_grid {
 	.container {
 		float: left;
 		margin: 0 60px;
@@ -13,6 +22,31 @@
 			float: left;
 		}
 	}
+}
+
+@system_color:  #64A8D1;
+@batch_color:   #FFC900;
+@service_color: #FF4940;
+
+#slide_description {
+	p {
+		width: 80%;
+		margin: 150px auto 0;
+		font-size: 48px;
+		line-height: 1.2em;
+		text-align: left;
+
+		span:nth-child(1) {
+			color: @system_color;
+		}
+		span:nth-child(2) {
+			color: @batch_color;
+		}
+		span:nth-child(3) {
+			color: @service_color;
+		}		
+	}
+
 }
 
 #zen {
@@ -28,8 +62,31 @@
 		display: block;
 	}
 	div {
+		font-family: 'Changa One';
 		padding-top: 150px;
 		font-size: 80px;
 		width: 120px;
+	}
+}
+
+#slide_state_persistence {
+	pre {
+		max-height: 250px;
+		overflow: auto;
+	}
+}
+
+
+#slide_whats_the_deal {
+	h4 {
+		margin-top: 90px;
+		font-size: 80px;
+	}
+}
+
+#slide_end {
+	h1 {
+		line-height: 1.3em;
+		letter-spacing: 0.05em;
 	}
 }
