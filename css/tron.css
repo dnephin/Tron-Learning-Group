@@ -95,6 +95,30 @@
 
 }
 
+#slide_batchs {
+	h2 {
+		color: @batch_color;
+	}
+}
+
+#slide_services {
+	h2 {
+		color: @service_color;
+	}	
+}
+
+#slide_system {
+	h2 {
+		color: @system_color;
+	}
+}
+
+#slide_component {
+	img {
+		border: 0;
+	}
+}
+
 #zen {
 	background: #222;
 	padding: 30px 100px;
@@ -117,16 +141,40 @@
 
 #slide_state_persistence {
 	pre {
-		max-height: 250px;
+		max-height: 500px;
 		overflow: auto;
 	}
+}
+
+.question_slide {
+	h4 {
+		margin-top: 90px;
+		font-size: 80px;
+		line-height: 1.2em;
+	}
+	blockquote {
+		margin: 100px auto;
+		font-family: 'Port Lligat Sans';
+	}
+}
+
+.quote_credit {
+	width: 85%;
+	font-family: 'bitstream vera sans mono';
+	text-align: right;
 }
 
 
 #slide_whats_the_deal {
 	h4 {
-		margin-top: 90px;
-		font-size: 80px;
+		
+	}
+}
+
+#slide_design_patterns {
+	img {
+		margin: -100px 0 0 -100px;
+		-webkit-transform:rotate(-15deg);
 	}
 }
 

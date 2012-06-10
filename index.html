@@ -64,9 +64,10 @@
      <p>Tron is a <span>centralized system</span><br /> for managing <span>periodic batch processes</span> and <span>services</span> across<br /> a cluster.</p>
 </section>
 
-<section>
+<section id="slide_batchs">
 	<h2>Batch Processes</h2>
     <!-- TODO: icons instead of lists -->
+    <!-- Job/JobRun/Action -->
 	<ul>
         <li>scheduling</li>
         <li>execute on remote machines</li>
@@ -75,7 +76,7 @@
     </ul>
 </section>
 
-<section>
+<section id="slide_services">
 	<h2>Services</h2>
     <ul>
         <li>start/stop services</li>
@@ -84,8 +85,8 @@
     </ul>
 </section>
 
-<section>
-    <h2>Centralized management</h2>
+<section id="slide_system">
+    <h2>Centralized system</h2>
     <ul>
         <li>view state of batches and services</li>
         <li>persistent history of previous runs, and state changes</li>
@@ -93,33 +94,19 @@
     </ul>
 </section>
 
-<section>
+<section id="slide_component" class="question_slide">
     <!-- TODO: icons for batch/service/management -->
-    <p>What constructs do we expect to see to implement these features?</p>
+    <h2>Components</h2>
+    <img src="imgs/components.png" />
 </section>
 
-<section>
-    <h2>Constructs</h2>
-    <ul>
-        <li class="fragment">Configuration management</li>
-        <li class="fragment">Web service API</li>
-        <li class="fragment">State persistence</li>
-        <li class="fragment">State machine</li>        
-        <li class="fragment">Networking</li>
-    </ul>
-</section>
-
-<section>
-    <h2>Building blocks</h2>
-    <ul>
-        <li>twisted</li>
-        <li>yaml</li>
-    </ul>
-</section>
 
 <section>
     <h2>Configuration</h2>
     <!-- TODO: sample configuration old and new -->
+    <pre><code>
+
+    </code></pre>
 </section>
 
 <section>
@@ -127,18 +114,14 @@
 </section>
 
 <section id="slide_state_persistence">
+    <section>
     <h2>State Persistence</h2>
     <!-- 140 lines -->
-    <pre class="fragment"><code contenteditable>
+    <pre><code>
 class StateHandler(object):
+    # 140 lines
     def __init__(self, mcp, working_dir, writing=False):
-        self.mcp = mcp
-        self.working_dir = working_dir
-        self.write_pid = None
-        self.write_start = None
-        self.writing_enabled = writing
-        self.store_delayed = False
-        self.event_recorder = event.EventRecorder(self, parent=mcp.event_recorder)
+        ...
 
     def restore_job(self, job_inst, data):
         job_inst.set_context(self.mcp.context)
@@ -153,8 +136,7 @@ class StateHandler(object):
             next.start()
 
     def restore_service(self, service, data):
-        service.set_context(self.mcp.context)
-        service.restore(data)
+        ...
 
     def delay_store(self):
         self.store_delayed = False
@@ -164,7 +146,7 @@ class StateHandler(object):
         if self.write_pid:
             pid, status = os.waitpid(self.write_pid, os.WNOHANG)
             if pid != 0:
-                log.info("State writing completed in in %d seconds", timeutils.current_timestamp() - self.write_start)
+                log.info("State writing completed in in %d seconds")
                 if status != 0:
                     log.warning("State writing process failed with status %d", status)
                     self.event_recorder.emit_critical("write_failed")
@@ -227,29 +209,6 @@ class StateHandler(object):
         with open(self.get_state_file_path()) as data_file:
             return self._load_data_file(data_file)
 
-    def _load_data_file(self, data_file):
-        data = yaml.load(data_file)
-
-        if 'version' not in data:
-            # Pre-versioned state files need to be reformatted a bit
-            data = {
-                'version': [0, 1, 9],
-                'jobs': data
-            }
-
-        # For properly comparing version, we need to convert this guy to a tuple
-        data['version'] = tuple(data['version'])
-        # By default we assume backwards compatability.
-        if data['version'] == tron.__version_info__:
-            return data
-        elif data['version'] > tron.__version_info__:
-            raise StateFileVersionError("State file has new version: %r", data['version'])
-        elif data['version'] < (0, 2, 0):
-            raise UnsupportedVersionError("State file has version %r" % (data['version'],))
-        else:
-            # Potential version conversions
-            return data
-
     @property
     def data(self):
         data = {
@@ -266,18 +225,14 @@ class StateHandler(object):
             data['services'][s.name] = s.data
 
         return data
-
-    def __str__(self):
-        return "STATE_HANDLER"
     </code></pre>
+    </section>
 
-    <pre class="fragment"><code contenteditable>
+    <section>
+    <pre><code>
 class PersistentStateManager(observer.Observer):
-    """Provides an interface to persist the state of Tron.
-
-    The implementation of persisting and restoring the state from disk is
-    handled by a class which supports the StateStore interface:
-
+    """
+    ...impl
     class IStateStore(object):
 
         def build_key(self, type, identifier):
@@ -298,72 +253,45 @@ class PersistentStateManager(observer.Observer):
         self.enabled            = True
         self._buffer            = buffer
         self._impl              = persistence_impl
-        self.metadata_key       = self._impl.build_key(
-                                    runstate.MCP_STATE, StateMetadata.name)
+        self.metadata_key       = self._impl.build_key(...)
 
     def restore(self, jobs, services):
-        """Return the most recent serialized state."""
-        log.debug("Restoring state.")
         self._restore_metadata()
 
-        return (self._restore_dicts(runstate.JOB_STATE, jobs),
-                self._restore_dicts(runstate.SERVICE_STATE, services))
-
-    def _restore_metadata(self):
-        metadata = self._impl.restore([self.metadata_key])
-        StateMetadata.validate_metadata(metadata.get(self.metadata_key))
+        return (self._restore_dicts(JOB_STATE, jobs),
+                self._restore_dicts(SERVICE_STATE, services))
 
     def _keys_for_items(self, item_type, items):
-        """Returns a dict of item to the key for that item."""
         make_key = self._impl.build_key
         keys = (make_key(item_type, item.name) for item in items)
         return dict(itertools.izip(keys, items))
 
    def _restore_dicts(self, item_type, items):
-        """Return a dict mapping of the items name to its state data."""
         key_to_item_map  = self._keys_for_items(item_type, items)
-        key_to_state_map = self._impl.restore(key_to_item_map.keys())
+        key_to_state = self._impl.restore(key_to_item_map.keys())
         return dict(
                 (key_to_item_map[key].name, state_data)
-                for key, state_data in key_to_state_map.iteritems())
+                for key, state_data in key_to_state.iteritems())
 
     def _save(self, type_enum, item):
-        """Persist an items state."""
         key = self._impl.build_key(type_enum, item.name)
         if self._buffer.save(key, item.state_data) and self.enabled:
             self._save_from_buffer()
 
-    def _save_from_buffer(self):
-        key_state_pairs = list(self._buffer)
-        if not key_state_pairs:
-            return
-
-        keys = ','.join(str(key) for key, _ in key_state_pairs)
-        log.debug("Saving state for %s" % keys)
-
-        with self._timeit():
-            try:
-                self._impl.save(key_state_pairs)
-            except Exception, e:
-                msg = "Failed to save state for %s: %s" % (keys, e)
-                log.warn(msg)
-                raise PersistenceStoreError(msg)
-
     def save_job(self, job):
-        self._save(runstate.JOB_STATE, job)
+        self._save(JOB_STATE, job)
 
     def save_service(self, service):
-        self._save(runstate.SERVICE_STATE, service)
+        self._save(SERVICE_STATE, service)
 
     def save_metadata(self):
-        self._save(runstate.MCP_STATE, StateMetadata())
+        self._save(MCP_STATE, StateMetadata())
 
     def cleanup(self):
         self._save_from_buffer()
         self._impl.cleanup()
 
     def handler(self, observable, _event):
-        """Handle a state change in an observable by saving its state."""
         if isinstance(observable, job.Job):
             self.save_job(observable)
         if isinstance(observable, service.Service):
@@ -371,13 +299,13 @@ class PersistentStateManager(observer.Observer):
 
     @contextmanager
     def disabled(self):
-        """Temporarily disable the state manager."""
         self.enabled, prev_enabled = False, self.enabled
         try:
             yield
         finally:
             self.enabled = prev_enabled
     </code></pre>
+    </section>
 </section>
 
 
@@ -404,9 +332,20 @@ def success(self):
     <h2>Networking</h2>
 </section>
 
-<section>
-    <h2>Design Patterns!</h2>
-    <img class="fragment" src="imgs/gang_of_four.jpg" />
+<section id="slide_design_patterns" class="question_slide">
+    <h4>Design Patterns!</h4>
+    <ul>
+        <li>Factory</li>
+        <li>Singleton</li>
+        <li>Composite</li>
+        <li>Decorator</li>
+        <li>Collection</li>
+        <li>Proxy</li>
+        <li>Command</li>
+        <li>Observer</li>
+        <li>Template</li>
+    </ul>
+    <img class="fragment" src="imgs/gang_of_four.jpg" />    
 </section>
 
 <section>
@@ -454,16 +393,11 @@ def _make_action_run(self, job_run, action_inst, callback):
     </code></pre> -->
 
     <pre class="fragment"><code contenteditable>
-class PersistenceManagerFactory(object):
-    """Create a PersistentStateManager."""
+...
 
     @classmethod
     def from_config(cls, persistence_config):
-        store_type              = persistence_config.store_type
-        name                    = persistence_config.name
-        connection_details      = persistence_config.connection_details
-        buffer_size             = persistence_config.buffer_size
-        store                   = None
+        ...
 
         if store_type == 'shelve':
             store = ShelveStateStore(name)
@@ -478,7 +412,7 @@ class PersistenceManagerFactory(object):
             store = YamlStateStore(name)
 
         if not store:
-            raise PersistenceStoreError("Unknown store type: %s" % store_type)
+            raise PersistenceStoreError("Unknown store type: ...")
 
         buffer = StateSaveBuffer(buffer_size)
         return PersistentStateManager(store, buffer)
@@ -496,23 +430,29 @@ class PersistenceManagerFactory(object):
     <!-- Formatting was tied to www.py -->
 </section>
 
-<section>
-    <p>hmm</p>
+<section class="question_slide">
+    <h4>hmm</h4>
 </section>
 
 <section>
-    <h2>Tests / Test Style</h2>
+    <h2>Tests</h2>
 </section>
 
-<section id="slide_whats_the_deal">
+<section id="slide_whats_the_deal" class="question_slide">
     <h4>So what's the deal?</h2>
     <h4 class="fragment">Code should be beautiful!</h4>
     <h4 class="fragment">Not convinced?</h4>
 </section>
 
-<section>
-    <p>beautiful</p>
-    <p class="fragment">aesthetically pleasing<p>
+<section class="question_slide">
+    <h4>beautiful?</h4>
+    <blockquote class="fragment" cite="http://en.wikipedia.org/wiki/Beauty">
+    <strong>Beauty</strong> ... is a characteristic of [code] that provides a perceptual experience of pleasure or satisfaction.
+    </blockquote>
+    <p class="fragment quote_credit">
+        wikipedia.org
+    </p>
+
 </section>
 
 <section>
@@ -541,10 +481,9 @@ Readability counts.
 
 <section id="analogy">
     <section>
-        <h2>A Couple Analogies</h2>
+        <h2>Maintenance</h2>
         <!-- shark vs broken windows -->
         <img class="fragment" src="imgs/shark.png" />
-        <div class="fragment">+</div>
         <img class="fragment" src="imgs/broken_windows.png" />
 
     </section>
@@ -553,12 +492,8 @@ Readability counts.
     </section>
 </section>
 
-<section>
-    <p>Readability impacts functional quality</p>
-</section>
-
-<section>
-    <p>So how do we make code beautiful?</p>
+<section class="question_slide">
+    <h4>So how do we make code beautiful?</h4>
     <!-- ACM issue 12/2011 art in the science -->
 </section>
 
@@ -605,13 +540,14 @@ Readability counts.
 </section>
 
 
-<section>
-    <p>Read your code!</p>
+<section class="question_slide">
+    <h4>Read your code!</h4>
 </section>
 
 
-<section>
-    <p>... and back to Tron</p>
+<section class="question_slide">
+    <h4>... and back to Tron</h4>
+    <h4 class="fragment">Tron of the future</h4>
 </section>
 
 <section>
@@ -633,8 +569,8 @@ Readability counts.
 </section>
 
 
-<section>
-    <p>... a stable release</p>
+<section class="question_slide">
+    <h4>... a stable release</h4>
 </section>
 
 
