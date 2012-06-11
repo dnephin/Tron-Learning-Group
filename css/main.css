@@ -80,7 +80,10 @@ body {
 
 .reveal h1 { font-size: 136px; 	font-family: 'Press Start 2P', sans-serif;	}
 .reveal h2 { font-size: 76px;	}
-.reveal h3 { font-size: 56px;	}
+.reveal h3 { 
+	font-size: 56px;
+	text-align: left;
+	}
 .reveal h4 { 
 	font-size: 36px;	
 	font-weight: normal;

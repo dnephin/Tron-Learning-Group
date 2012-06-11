@@ -102,15 +102,162 @@
 
 
 <section>
-    <h2>Configuration</h2>
-    <!-- TODO: sample configuration old and new -->
-    <pre><code>
+    <section>
+        <h2>Configuration</h2>
+        <!-- TODO: sample configuration old and new -->
+        <pre><code>
+ssh_options:
+    agent: true
 
-    </code></pre>
+nodes:
+    - hostname: "localhost"
+
+    - name:     "batch1"
+      hostname: "batch1.365"
+
+    - name:     "prodservices"
+      hostname: "prodsrv"
+
+node_pools:
+    - name:     "all"
+      nodes:    [localhost, batch1, prodservices]
+
+command_context:
+    PYTHON:   "/usr/bin/python"
+    YELPCODE: "/nail/live/yelp"
+        </code></pre>
+    </section>
+
+    <section>
+        <pre><code>
+jobs:
+    - name:     "very_important_job"
+      node:     "batch1"
+      schedule: "interval 30 min"
+      actions:
+        -   name:    "run_important_job"
+            command: "echo 'hello?' | wall"
+        </code></pre>
+        <pre class="fragment"><code>
+    - name:     "calculate_things"
+      node:     "all"
+      schedule: "daily 01:00:00"
+      actions:
+
+        -   name:    "wait_for_logs"
+            command: "%(PYTHON)s %(YELPCODE)s/log_done.py ranger"
+
+        -   name:    "do_important_things"
+            command: "%(PYTHON)s %(YELPCODE)s/batch/..."
+            requires: ["wait_for_logs"]
+
+      cleanup_action:
+            command: "rm -f /nail/tmp/some_files"
+        </code></pre>
+    </section>
+
+    <section>
+        <pre><code>
+services:
+
+    -   name:     "web_service"
+        node:     "pool1"
+        pid_file: "/tmp/%(name)s-%(instance_number)s.pid"
+        command:  "%(PYTHON)s %(YELPCODE)s/service.py %(pid_file)s"
+        count:    3
+        monitor_interval: 60
+        restart_interval: 20
+        </code></pre>
+    </section>    
+
 </section>
 
-<section>
-    <h2>Web Service API</h2>
+<section id="slide_commands">
+    <section>
+        <h2>Commands</h2>
+        <h3>tronfig</h3>
+        <p>Retreive the active configuration and upload a new configuration.</p>
+        <pre class="fragment output">
+<strong>$</strong> tronfig
+...
+Configuration uploaded successfully
+    </section>
+
+    <section>
+        <h3>tronview</h3>
+        <p>View ... everything.</p>
+        <pre class="output">
+<strong>$</strong> tronview
+...
+
+<strong>$</strong> tronview important_job
+...
+<span class="header">Run ID      State       Node            Scheduled Time     </span>
+.6          <span class="fail">FAIL</span>        localhost       2012-05-12 18:36:43
+<span class="dates">            Start: 2012-05-12 18:36:43  End: ...</span>
+.5          SUCC        localhost       2012-05-12 18:36:30
+<span class="dates">            Start: 2012-05-12 18:36:30  End: ...</span>
+
+<strong>$</strong> tronview important_job.5.run_the_job
+
+echo "It worked"
+
+Stdout:
+It worked
+
+Stderr:
+        </pre>
+    </section>
+
+
+    <section>
+        <h3>tronctl</h3>
+        <p>Enable, disable and manually run Jobs.<br />  Start and stop services.</p>
+        <pre  class="output">
+<strong>$</strong> tronctl disableall
+All jobs are now disabled
+
+
+<strong>$</strong> tronctl enable just_my_job
+Job just_my_job is enabled
+
+
+<strong>$</strong> tronctl start auth_service
+Service starting
+        </pre>
+    </section>
+
+    <section>
+        <h3>API</h3>
+        <p>REST, JSON</p>
+        <pre class="fragment"><code>
+{
+    "name":         "important_job",
+    "action_names": ["task0"], 
+    "href":         "/jobs/interval_job0", 
+    "last_success": "2012-06-10 15:48:24",
+    "scheduler":    "INTERVAL:0:00:13", 
+    "status":       "DISABLED"    
+    "node_pool":    ["localhost"], 
+    "runs": [
+        {
+            "href":     "/jobs/interval_job0/6", 
+            "id":       "important_job.6",
+            "node":     "localhost",
+            "state":    "CANC"
+            ...
+        }, 
+    ],
+    ... 
+}
+
+        </code></pre>
+    </section>
+</section>
+
+<section class="question_slide">
+    <h4>Rough edges</h4>
+
 </section>
 
 <section id="slide_state_persistence">
@@ -309,32 +456,105 @@ class PersistentStateManager(observer.Observer):
 </section>
 
 
-<section>
-    <h2>State Machine</h2>
+<section id="slide_state_machine">
+    <section>
+        <h2>State Machine</h2>
 
-    <pre class="fragment"><code contenteditable>
-def mark_success(self):
-    self.exit_status = 0
-    self.end_time = timeutils.current_time()
-    self.machine.transition('success')
-    </code></pre>
-
-    <pre class="fragment"><code contenteditable>
-def success(self):
-    if self.machine.transition('success'):
+        <h3>Exhibit A</h3>
+        <pre class="fragment"><code>
+    def mark_success(self):
         self.exit_status = 0
-        self.end_time    = timeutils.current_time()
-        return True
-    </code></pre>
+        self.end_time = timeutils.current_time()
+        self.machine.transition('success')
+        </code></pre>
+
+        <pre class="fragment"><code>
+    def success(self):
+        if self.machine.transition('success'):
+            self.exit_status = 0
+            self.end_time    = timeutils.current_time()
+            return True
+        </code></pre>
+    </section>
+
+    <section>
+        <h3>Exhibit B</h3>
+        <pre><code>
+@property
+def should_start(self):
+    if not self.job.enabled or self.is_running:
+        return False
+    node = self.node if self.job.all_nodes else None
+    return self.job.next_to_finish(node) is self
+        </code></pre>
+
+        <pre class="fragment"><code>
+def start(self):
+    if not self.machine.check('start'):
+        raise InvalidStartStateError(self.state)
+    ...
+        </code></pre>        
+
+    </section>
 </section>
 
 <section>
-    <h2>Networking</h2>
+    <section>
+        <h2>Complexity</h2>
+        <pre><code>
+def next_to_finish(self, node=None):
+    """Useful for getting the currently running job run or next 
+    queued/schedule job run.
+    """
+    def choose(prev, next):
+        return (prev if (prev and prev.is_running) 
+            or (node and next.node != node)
+            or next.is_success 
+            or next.is_failure 
+            or next.is_cancelled 
+            or next.is_unknown 
+            else next)
+
+    return reduce(choose, self.runs, None)
+        </code></pre>
+        <pre class="fragment"><code>
+choose(None, choose(run[0], choose(run[1], choose(run[n-1], run[n]))))
+        </code></pre>
+    </section>
+
+    <section>
+        <pre><code>        
+def get_next_to_finish(self, node=None):
+    """Return the most recent run which is either running or scheduled
+    """
+    def choose(run):
+        if node and run.node != node:
+            return False
+        if run.is_running or run.is_scheduled:
+            return run
+    return self._get_run_using(choose)
+        </code></pre>
+        <pre class="fragment"><code>
+def _get_run_using(self, func, reverse=False):
+    try:
+        return self._get_runs_using(func, reverse).next()
+    except StopIteration:
+        return None
+
+def _get_runs_using(self, func, reverse=False):
+    job_runs = self.runs if not reverse else reversed(self.runs)
+    return itertools.ifilter(func, job_runs)
+        </code></pre>
+    </section>
+</section>
+
+<section class="question_slide">
+    <h4>cleanup</h4>
 </section>
 
 <section id="slide_design_patterns" class="question_slide">
     <h4>Design Patterns!</h4>
-    <ul>
+    <ul class="fragment">
         <li>Factory</li>
         <li>Singleton</li>
         <li>Composite</li>
