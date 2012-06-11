@@ -116,12 +116,6 @@
 	}
 }
 
-#slide_component, #slide_collections {
-	img {
-		border: 0;
-	}
-}
-
 @commands: #3D9AD1;
 
 #slide_commands {
@@ -166,16 +160,6 @@
 }
 
 #analogy {
-	div, img {
-		float: left;
-		display: block;
-	}
-	div {
-		font-family: 'Changa One';
-		padding-top: 150px;
-		font-size: 80px;
-		width: 120px;
-	}
 }
 
 #slide_state_persistence {
