@@ -548,6 +548,33 @@ def _get_runs_using(self, func, reverse=False):
     </section>
 </section>
 
+<section>
+        <h2>Tests</h2>
+        <pre class="fragment"><code>
+class ConstantScheduler(object):
+
+    def next_run_time(self, _):
+        return timeutils.current_time()
+        </code></pre>
+
+        <pre class="fragment"><code>
+class ConstantSchedulerTest(TestCase):
+    @setup
+    def build_scheduler(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.scheduler = scheduler.ConstantScheduler()
+        self.action = action.Action("Test Action")
+        self.action.command = "Test Command"
+        self.job = job.Job("Test Job", self.action)
+        self.job.node_pool = turtle.Turtle()
+        self.job.output_path = self.test_dir
+        self.job.scheduler = self.scheduler
+        self.action.job = self.job
+
+    ...
+        </code></pre>
+</section>
+
 <section class="question_slide">
     <h4>cleanup</h4>
 </section>
@@ -587,11 +614,9 @@ class Observable(object):
 class Observer(object):
 
     def watch(self, observable, event=True):
-        """Adds this Observer as a watcher of the observable."""
         observable.attach(event, self)
 
     def handler(self, observable, event):
-        """Override this method to call a method to handle events."""
         pass
     </code></pre>
 </section>
@@ -640,8 +665,45 @@ def _make_action_run(self, job_run, action_inst, callback):
 </section>
 
 
-<section>
-    <h2>Collections</h2>
+<section id="slide_collections">
+    <section>
+        <h2>Collections</h2>
+        <img class="fragment" src="imgs/collection_uml.png" />
+        <pre class="fragment"><code>
+class JobRunCollection(object):
+    ...
+
+    def __init__(self, run_limit):
+        self.run_limit = run_limit
+        self.runs = deque()
+
+    def restore_state(self, ...):
+        ...
+
+    def build_new_run(self, ...):
+        ...
+        </code></pre>
+    </section>
+    <section>
+        <pre><code>
+    def get_newest(self, include_manual=True):
+        func = lambda r: True if include_manual else not r.manual
+        return self._get_run_using(func)
+
+    def get_first_queued(self, node=None):
+        ...
+        return self._get_run_using(queued_func, reverse=True)
+
+    def get_pending(self):
+        func = lambda r: r.is_scheduled or r.is_queued
+        return self._get_runs_using(func)
+
+    def get_active(self, node=None):
+        ...
+        return self._get_runs_using(func)
+
+        </code></pre>        
+    </section>
 </section>
 
 
@@ -650,13 +712,6 @@ def _make_action_run(self, job_run, action_inst, callback):
     <!-- Formatting was tied to www.py -->
 </section>
 
-<section class="question_slide">
-    <h4>hmm</h4>
-</section>
-
-<section>
-    <h2>Tests</h2>
-</section>
 
 <section id="slide_whats_the_deal" class="question_slide">
     <h4>So what's the deal?</h2>

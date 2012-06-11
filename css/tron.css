@@ -116,7 +116,7 @@
 	}
 }
 
-#slide_component {
+#slide_component, #slide_collections {
 	img {
 		border: 0;
 	}
