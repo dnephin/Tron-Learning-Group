@@ -1,4 +1,15 @@
 
+
+.reveal section {
+    ul {
+        margin-top: 100px;
+        li {
+            line-height: 1.5em;
+        }
+    }
+}
+
+
 @tron: #BFA130;
 
 #slide_title {
@@ -184,6 +195,12 @@
 	}
 }
 
+.howto {
+    h2 {
+        color: #64A8D1;
+    }
+}
+
 .quote_credit {
 	width: 85%;
 	font-family: 'bitstream vera sans mono';
@@ -202,6 +219,9 @@
 		margin: -100px 0 0 -100px;
 		-webkit-transform:rotate(-15deg);
 	}
+    ul {
+        margin: 0;
+    }
 }
 
 #slide_end {
