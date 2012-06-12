@@ -708,8 +708,49 @@ class JobRunCollection(object):
 
 
 <section>
-    <h2>Formatters</h2>
-    <!-- Formatting was tied to www.py -->
+    <section>
+    <h2>Template Method</h2>
+    <!-- display tables, format json, parse config -->
+    <pre><code>
+class Validator(object):
+    config_class            = None
+    defaults                = {}
+    validators              = {}
+    optional                = False
+
+    def validate(self, in_dict):
+        ...
+        in_dict = self.cast(in_dict)
+        self.validate_required_keys(in_dict)
+        self.validate_extra_keys(in_dict)
+        ...
+        return self.config_class(**output_dict)
+
+    def cast(self, in_dict):
+        return in_dict
+
+    def validate_required_keys(self, in_dict):
+        ...
+
+    def validate_extra_keys(self, in_dict):
+        ...
+</code></pre>
+</section>
+
+<section>
+<pre><code>
+class ValidateNode(Validator):
+    config_class =              ConfigNode
+    validators = {
+        'name':                 partial(valid_identifier, 'nodes'),
+        'hostname':             partial(valid_str, 'nodes')
+    }
+
+    def cast(node_dict):
+        ...
+
+    </code></pre>
+</section>
 </section>
 
 
@@ -745,7 +786,7 @@ class JobRunCollection(object):
 >>> import this
 The Zen of Python, by Tim Peters
 
-Beautiful is better than ugly.
+<strong>Beautiful is better</strong> than ugly.
 Explicit is better than implicit.
 Simple is better than complex.
 Complex is better than complicated.
@@ -757,14 +798,13 @@ Readability counts.
 
 <section id="analogy">
     <section>
-        <h2>Maintenance</h2>
+        <h2>Code in Motion</h2>
         <!-- shark vs broken windows -->
         <img class="fragment" src="imgs/shark.png" />
-        <img class="fragment" src="imgs/broken_windows.png" />
 
     </section>
     <section>
-        <!-- TODO: graph of quality to time -->
+        <img src="imgs/quality_graph.png" />
     </section>
 </section>
 
@@ -778,46 +818,73 @@ Readability counts.
     <!-- alignment, indentation, guards, etc -->
     <!-- program as a table -->
     <!-- max 80 character lines -->
-</section>
-
-<section>
-    <h2>Context</h2>
-    <!-- domain language -->
+    <ul>
+        <li class="fragment">Alignment and indentation</li>
+        <li class="fragment">Max characters per line</li>
+        <li class="fragment">Guard statements and flow</li>
+    </ul>
 </section>
 
 
 <section>
     <h2>Naming</h2>
     <!-- design patterns come in here a lot -->
+    <ul>
+        <li class="fragment">English is your guide</li>
+        <li class="fragment">Contextual naming</li>
+        <li class="fragment">Expected names</li>
+        <li class="fragment">Appropriately specific names</li>
+    </ul>
 </section>
 
 
 <section>
     <h2>Code over Comments</h2>
     <!-- self documenting code, comments can lie, etc -->
+    <ul>
+        <li class="fragment">Self documented is better then explained</li>
+        <li class="fragment">Comments are not an excuse for complexity</li>
+    </ul>
 </section>
 
 
 <section>
     <h2>Design Patterns</h2>
     <!-- code to an interface -->
+    <ul>
+        <li class="fragment">Code to an interface</li>
+        <li class="fragment">Abstraction layers</li>
+        <li class="fragment">Reduce complexity</li>
+        <li class="fragment">It's been done before</li>
 </section>
 
 
 <section>
     <h2>Tests</h2>
     <!-- before code, synchronously -->
+    <ul>
+        <li class="fragment">Before is better then after</li>
+        <li class="fragment">Many unit tests for each layer</li>
+        <li class="fragment">Fewer integration tests</li>
+        <li class="fragment">They can teach you things</li>
+    </ul>
 </section>
 
 
 <section>
     <h2>Keep it short</h2>
     <!-- portability, maintainability, understanding -->
+    <ul>
+        <li class="fragment">Short functions, classes, modules</li>
+        <li class="fragment">Re-usable</li>
+        <li class="fragment">Maintainability</li>
+        <li class="fragment">Understanding</li>
+    </ul>
 </section>
 
 
 <section class="question_slide">
-    <h4>Read your code!</h4>
+    <h4>Read the code!</h4>
 </section>
 
 

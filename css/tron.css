@@ -157,6 +157,9 @@
 	padding: 30px 100px;
 	font-size: 22px;
 	width: auto;
+    strong {
+        color: @exhibit;
+    }
 }
 
 #analogy {
