@@ -89,7 +89,7 @@
     <h2>Centralized system</h2>
     <ul>
         <li>view state of batches and services</li>
-        <li>persistent history</li>
+        <li>persist run history</li>
         <li>web services interface</li>
     </ul>
 </section>
@@ -234,14 +234,14 @@ Service starting
 {
     "name":         "important_job",
     "action_names": ["task0"], 
-    "href":         "/jobs/interval_job0", 
+    "href":         "/jobs/important_job", 
     "last_success": "2012-06-10 15:48:24",
     "scheduler":    "INTERVAL:0:00:13", 
     "status":       "DISABLED"    
     "node_pool":    ["localhost"], 
     "runs": [
         {
-            "href":     "/jobs/interval_job0/6", 
+            "href":     "/jobs/important_job/6", 
             "id":       "important_job.6",
             "node":     "localhost",
             "state":    "CANC"
@@ -480,12 +480,9 @@ class PersistentStateManager(observer.Observer):
     <section>
         <h3>Exhibit B</h3>
         <pre><code>
-@property
-def should_start(self):
-    if not self.job.enabled or self.is_running:
-        return False
-    node = self.node if self.job.all_nodes else None
-    return self.job.next_to_finish(node) is self
+def start(self):
+    if not (self.is_scheduled or self.is_queued):
+        raise InvalidStartStateError("Not scheduled")
         </code></pre>
 
         <pre class="fragment"><code>
@@ -799,11 +796,11 @@ Readability counts.
 <section id="analogy">
     <section>
         <h2>Code in Motion</h2>
-        <!-- shark vs broken windows -->
-        <img class="fragment" src="imgs/shark.png" />
+        <img class="fragment" src="imgs/shark.jpg" />
 
     </section>
     <section>
+        <h3>over time...</h3>
         <img src="imgs/quality_graph.png" />
     </section>
 </section>
@@ -815,6 +812,7 @@ Readability counts.
 
 <section class="howto">
     <h2>White Space and Structure</h2>
+    <!-- finding the art in the science -->
     <!-- alignment, indentation, guards, etc -->
     <!-- program as a table -->
     <!-- max 80 character lines -->
@@ -833,7 +831,7 @@ Readability counts.
         <li class="fragment">English is your guide</li>
         <li class="fragment">Contextual naming</li>
         <li class="fragment">Expected names</li>
-        <li class="fragment">Appropriately specific names</li>
+        <li class="fragment">Appropriate specificity</li>
     </ul>
 </section>
 
@@ -876,9 +874,8 @@ Readability counts.
     <!-- portability, maintainability, understanding -->
     <ul>
         <li class="fragment">Short functions, classes, modules</li>
-        <li class="fragment">Re-usable</li>
-        <li class="fragment">Maintainability</li>
-        <li class="fragment">Understanding</li>
+        <li class="fragment">Reusable</li>
+        <li class="fragment">Maintainable</li>
     </ul>
 </section>
 
