@@ -71,7 +71,7 @@
 	<ul>
         <li>scheduling</li>
         <li>execute on remote machines</li>
-        <li>depedency management</li>
+        <li>dependency management</li>
         <li>run history</li>
     </ul>
 </section>
@@ -176,7 +176,7 @@ services:
     <section>
         <h2>Commands</h2>
         <h3>tronfig</h3>
-        <p>Retreive the active configuration and upload a new configuration.</p>
+        <p>Retrieve the active configuration and upload a new configuration.</p>
         <pre class="fragment output">
 <strong>$</strong> tronfig
 ...
@@ -621,18 +621,6 @@ class Observer(object):
 
 <section>
     <h2>Factory</h2>
-<!--     <pre class="fragment"><code>
-def _make_action_run(self, job_run, action_inst, callback):
-        action_run = action_inst.build_run(job_run)
-
-        action_run.node = job_run.node
-
-        action_run.machine.listen(True, self._notify)
-        action_run.machine.listen(action.ActionRun.STATE_SUCCEEDED, callback)
-        action_run.machine.listen(action.ActionRun.STATE_FAILED, callback)
-
-        return action_run
-    </code></pre> -->
 
     <pre class="fragment"><code contenteditable>
 ...
@@ -762,7 +750,7 @@ class ValidateNode(Validator):
     <blockquote class="fragment" cite="http://en.wikipedia.org/wiki/Beauty">
     <strong>Beauty</strong> ... is a characteristic of [code] that provides a perceptual experience of pleasure or satisfaction.
     </blockquote>
-    <p class="fragment quote_credit">
+    <p class="quote_credit">
         wikipedia.org
     </p>
 

@@ -17,10 +17,14 @@
 		margin: 180px auto 100px;
 		font-family: 'Changa One';
 		color: @tron;
+        letter-spacing: 0.1em;
 	}
 	h3 {
 		text-align: center;
 	}
+    h4 {
+        font-size: 30px;
+    }
 }
 
 
