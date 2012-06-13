@@ -6,12 +6,14 @@ i was encourage
 the story of tron
 how many people have heard of Tron
 
+
 Tron is a system we use here at yelp
 for running batches and services
 created here, by the infra team circa 2009
 cron was no longer meeting our requirements
 the plan was to build
 using twisted and yaml
+
 
 fast forward a couple years
 yelp is now widely used for batches and services
@@ -21,12 +23,14 @@ i had recently joined the infra team
 and I heard that Tron was going to be moving 
 back under the infra umbrella
 
+
 at the time, 
 I felt like the general concensus
 was that Tron needed a lot of work
 For the most part it had been working
 there were definitely some rough edges,
 some parts needed to be completely refactored
+
 
 I was excited to hear this
 I eagerly volunteered to work on the project
@@ -38,7 +42,9 @@ so i did a bit of digging,
 i met with some people who had more experience with tron
 and got an idea for what the major blockers were
 
+
 I learned that Tron had a few components
+
 
 a job scheduler
 at its core, the same essential idea as cron
@@ -52,12 +58,14 @@ in the job scheduling world
 a Job is a collection of actions
 an action identifies the process to run
 
+
 service monitor
 starts and stop services, daemons
 each service can be configured to run on any number of remote machines
 each service can also have multiple instances
 when a service fails, it can be configured to restart
 and tron will run the daemon again
+
 
 configuration management
 loads a yaml config file filled with nodes, jobs and services
@@ -86,6 +94,7 @@ i want the code to be more enjoyable to work with
 smaller blocks are easier to understand
 i wanted Tron to be more stable and easier to user and administrate
 
+
 so what did i do, and how did i do it?
 i started refactoring things into smaller classes
 and into design patterns
@@ -98,6 +107,7 @@ trying to make your code fit into a pattern is the wrong approach
 the idea is to find the pattern that use code is using anyways
 and formalize it
 
+
 i think that a lot of people see design patterns as theory
 but i think in reality they aren't derived from acedemia
 which is maybe why they aren't tought very much in school
@@ -107,6 +117,7 @@ this allows us to take advantage of all their experience
 so we don't have to repeat the same mistakes they did
 I won't bore you with every pattern I've used in Tron
 but let's take a look at a couple key patterns
+
 
 observer
 behavioural pattern
@@ -120,6 +131,7 @@ the observable is the child
 it allows observers to attach to it
 and sends a notify when it's state changes
 
+
 factory
 is a creational pattern
 it's great for constructing objects which have many requirements
@@ -127,12 +139,14 @@ allowing you to keep your constructor simple
 makes testing these classes a lot easier, way less patching
 reduces coupling between when you need to build one object from another
 
+
 collection
 i first saw this pattern in backbone.js
 it's useful when you have a data structure of objects
 and you want to be able to operate on all the objects at once
 or possible filter the data structure in different ways
 very useful in tron because there are many collections of objects
+
 
 template
 common behavioural pattern
@@ -166,11 +180,25 @@ guard statements and flow
 code doesn't have to look like an arrow, 
 guard statements make it much easier to reason about
 
+
 naming
+naming is a hard problem
+it's more of an art
+when I'm choosing names I try to make it human readable when it's used
+the context can help keep variable names short
+no reason to repeat the name of the class in every variable name
+using expected names can help a lot
+appropriate specificity is the idea that a very general class
+like a data structure
+should have a very general name
+where as a very specific class, like  a business logic class
+should have a specific name
+
 
 code over comments
 comments are primarely useful for creating API docs
 code should self document
+
 
 keep it short
 short code is more re-usable because it will only do a single thing
@@ -199,5 +227,6 @@ so what is next for Tron?
 - always more refactoring
 - the next release
 - future features
+
 
 Where to learn more
