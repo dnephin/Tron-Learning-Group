@@ -130,534 +130,15 @@
 </section>
 
 <section>
-    <h2></h2>
+    <h2>Design Patterns</h2>
     <ul>
-        <li></li>
-        <li></li>
-        <li></li>
+        <li>derived from practical experience</li>
+        <li>it's been done before</li>
     </ul>
 </section>
 
-
-<!-- template -->
 <section>
-    <h2></h2>
-    <ul>
-        <li></li>
-    </ul>
-</section>
-
-
-
-<section id="slide_system">
-    <h2>Centralized system</h2>
-    <ul>
-        <li>view state of batches and services</li>
-        <li>persist run history</li>
-        <li>web services interface</li>
-    </ul>
-</section>
-
-<section id="slide_component" class="question_slide">
-    <!-- TODO: icons for batch/service/management -->
-    <h2>Components</h2>
-    <img src="imgs/components.png" />
-</section>
-
-
-<section>
-    <section>
-        <h2>Configuration</h2>
-        <!-- TODO: sample configuration old and new -->
-        <pre><code>
-ssh_options:
-    agent: true
-
-nodes:
-    - hostname: "localhost"
-
-    - name:     "batch1"
-      hostname: "batch1.365"
-
-    - name:     "prodservices"
-      hostname: "prodsrv"
-
-node_pools:
-    - name:     "all"
-      nodes:    [localhost, batch1, prodservices]
-
-command_context:
-    PYTHON:   "/usr/bin/python"
-    YELPCODE: "/nail/live/yelp"
-        </code></pre>
-    </section>
-
-    <section>
-        <pre><code>
-jobs:
-    - name:     "very_important_job"
-      node:     "batch1"
-      schedule: "interval 30 min"
-      actions:
-        -   name:    "run_important_job"
-            command: "echo 'hello?' | wall"
-        </code></pre>
-        <pre class="fragment"><code>
-    - name:     "calculate_things"
-      node:     "all"
-      schedule: "daily 01:00:00"
-      actions:
-
-        -   name:    "wait_for_logs"
-            command: "%(PYTHON)s %(YELPCODE)s/log_done.py ranger"
-
-        -   name:    "do_important_things"
-            command: "%(PYTHON)s %(YELPCODE)s/batch/..."
-            requires: ["wait_for_logs"]
-
-      cleanup_action:
-            command: "rm -f /nail/tmp/some_files"
-        </code></pre>
-    </section>
-
-    <section>
-        <pre><code>
-services:
-
-    -   name:     "web_service"
-        node:     "pool1"
-        pid_file: "/tmp/%(name)s-%(instance_number)s.pid"
-        command:  "%(PYTHON)s %(YELPCODE)s/service.py %(pid_file)s"
-        count:    3
-        monitor_interval: 60
-        restart_interval: 20
-        </code></pre>
-    </section>    
-
-</section>
-
-<section id="slide_commands">
-    <section>
-        <h2>Commands</h2>
-        <h3>tronfig</h3>
-        <p>Retrieve the active configuration and upload a new configuration.</p>
-        <pre class="fragment output">
-<strong>$</strong> tronfig
-...
-Configuration uploaded successfully
-    </section>
-
-    <section>
-        <h3>tronview</h3>
-        <p>View ... everything.</p>
-        <pre class="output">
-<strong>$</strong> tronview
-...
-
-<strong>$</strong> tronview important_job
-...
-<span class="header">Run ID      State       Node            Scheduled Time     </span>
-.6          <span class="fail">FAIL</span>        localhost       2012-05-12 18:36:43
-<span class="dates">            Start: 2012-05-12 18:36:43  End: ...</span>
-.5          SUCC        localhost       2012-05-12 18:36:30
-<span class="dates">            Start: 2012-05-12 18:36:30  End: ...</span>
-
-<strong>$</strong> tronview important_job.5.run_the_job
-
-echo "It worked"
-
-Stdout:
-It worked
-
-Stderr:
-        </pre>
-    </section>
-
-
-    <section>
-        <h3>tronctl</h3>
-        <p>Enable, disable and manually run Jobs.<br />  Start and stop services.</p>
-        <pre  class="output">
-<strong>$</strong> tronctl disableall
-All jobs are now disabled
-
-
-<strong>$</strong> tronctl enable just_my_job
-Job just_my_job is enabled
-
-
-<strong>$</strong> tronctl start auth_service
-Service starting
-        </pre>
-    </section>
-
-    <section>
-        <h3>API</h3>
-        <p>REST, JSON</p>
-        <pre class="fragment"><code>
-{
-    "name":         "important_job",
-    "action_names": ["task0"], 
-    "href":         "/jobs/important_job", 
-    "last_success": "2012-06-10 15:48:24",
-    "scheduler":    "INTERVAL:0:00:13", 
-    "status":       "DISABLED"    
-    "node_pool":    ["localhost"], 
-    "runs": [
-        {
-            "href":     "/jobs/important_job/6", 
-            "id":       "important_job.6",
-            "node":     "localhost",
-            "state":    "CANC"
-            ...
-        }, 
-    ],
-    ... 
-}
-
-        </code></pre>
-    </section>
-</section>
-
-<section class="question_slide">
-    <h4>Rough edges</h4>
-
-</section>
-
-<section id="slide_state_persistence">
-    <section>
-    <h2>State Persistence</h2>
-    <!-- 140 lines -->
-    <pre><code>
-class StateHandler(object):
-    # 140 lines
-    def __init__(self, mcp, working_dir, writing=False):
-        ...
-
-    def restore_job(self, job_inst, data):
-        job_inst.set_context(self.mcp.context)
-        job_inst.restore(data)
-
-        for run in job_inst.runs:
-            if run.is_scheduled:
-                reactor.callLater(sleep_time(run.run_time), self.mcp.run_job, run)
-
-        next = job_inst.next_to_finish()
-        if job_inst.enabled and next and next.is_queued:
-            next.start()
-
-    def restore_service(self, service, data):
-        ...
-
-    def delay_store(self):
-        self.store_delayed = False
-        self.store_state()
-
-    def check_write_child(self):
-        if self.write_pid:
-            pid, status = os.waitpid(self.write_pid, os.WNOHANG)
-            if pid != 0:
-                log.info("State writing completed in in %d seconds")
-                if status != 0:
-                    log.warning("State writing process failed with status %d", status)
-                    self.event_recorder.emit_critical("write_failed")
-                else:
-                    self.event_recorder.emit_ok("write_complete")
-                self.write_pid = None
-                self.write_start = None
-            else:
-                # Process hasn't exited
-                write_duration = timeutils.current_timestamp() - self.write_start
-                if write_duration > WRITE_DURATION_WARNING_SECS:
-                    log.warning("State writing hasn't completed in %d secs", write_duration)
-                    self.event_recorder.emit_notice("write_delayed")
-
-                reactor.callLater(STATE_SLEEP_SECS, self.check_write_child)
-
-    def store_state(self):
-        """Stores the state of tron"""
-        log.debug("store_state called: %r, %r", self.write_pid, self.writing_enabled)
-
-        # If tron is already storing data, don't start again till it's done
-        if self.write_pid or not self.writing_enabled:
-            # If a child is writing, we don't want to ignore this change, so lets try it later
-            if not self.store_delayed:
-                self.store_delayed = True
-                reactor.callLater(STATE_SLEEP_SECS, self.delay_store)
-            return
-
-        tmp_path = os.path.join(self.working_dir, '.tmp.' + STATE_FILE)
-        file_path = os.path.join(self.working_dir, STATE_FILE)
-        log.info("Storing state in %s", file_path)
-
-        self.event_recorder.emit_info("storing")
-
-        self.write_start = timeutils.current_timestamp()
-        pid = os.fork()
-        if pid:
-            self.write_pid = pid
-            reactor.callLater(STATE_SLEEP_SECS, self.check_write_child)
-        else:
-            exit_status = os.EX_SOFTWARE
-            try:
-                with open(tmp_path, 'w') as data_file:
-                    yaml.dump(self.data, data_file, default_flow_style=False, indent=4)
-                    data_file.flush()
-                    os.fsync(data_file.fileno())
-                shutil.move(tmp_path, file_path)
-                exit_status = os.EX_OK
-            except:
-                log.exception("Failure while writing state")
-            finally:
-                os._exit(exit_status)
-
-    def get_state_file_path(self):
-        return os.path.join(self.working_dir, STATE_FILE)
-
-    def load_data(self):
-        log.info('Restoring state from %s', self.get_state_file_path())
-        self.event_recorder.emit_notice("restoring")
-        with open(self.get_state_file_path()) as data_file:
-            return self._load_data_file(data_file)
-
-    @property
-    def data(self):
-        data = {
-            'version': tron.__version_info__,
-            'create_time': int(time.time()),
-            'jobs': {},
-            'services': {},
-        }
-
-        for j in self.mcp.jobs.itervalues():
-            data['jobs'][j.name] = j.data
-
-        for s in self.mcp.services.itervalues():
-            data['services'][s.name] = s.data
-
-        return data
-    </code></pre>
-    </section>
-
-    <section>
-    <pre><code>
-class PersistentStateManager(observer.Observer):
-    """
-    ...impl
-    class IStateStore(object):
-
-        def build_key(self, type, identifier):
-            return &lt;a key&gt;
-
-        def restore(self, keys):
-            return &lt;dict of key to states&gt;
-
-        def save(self, key, state_data):
-            pass
-
-        def cleanup(self):
-            pass
-
-    """
-
-    def __init__(self, persistence_impl, buffer):
-        self.enabled            = True
-        self._buffer            = buffer
-        self._impl              = persistence_impl
-        self.metadata_key       = self._impl.build_key(...)
-
-    def restore(self, jobs, services):
-        self._restore_metadata()
-
-        return (self._restore_dicts(JOB_STATE, jobs),
-                self._restore_dicts(SERVICE_STATE, services))
-
-    def _keys_for_items(self, item_type, items):
-        make_key = self._impl.build_key
-        keys = (make_key(item_type, item.name) for item in items)
-        return dict(itertools.izip(keys, items))
-
-   def _restore_dicts(self, item_type, items):
-        key_to_item_map  = self._keys_for_items(item_type, items)
-        key_to_state = self._impl.restore(key_to_item_map.keys())
-        return dict(
-                (key_to_item_map[key].name, state_data)
-                for key, state_data in key_to_state.iteritems())
-
-    def _save(self, type_enum, item):
-        key = self._impl.build_key(type_enum, item.name)
-        if self._buffer.save(key, item.state_data) and self.enabled:
-            self._save_from_buffer()
-
-    def save_job(self, job):
-        self._save(JOB_STATE, job)
-
-    def save_service(self, service):
-        self._save(SERVICE_STATE, service)
-
-    def save_metadata(self):
-        self._save(MCP_STATE, StateMetadata())
-
-    def cleanup(self):
-        self._save_from_buffer()
-        self._impl.cleanup()
-
-    def handler(self, observable, _event):
-        if isinstance(observable, job.Job):
-            self.save_job(observable)
-        if isinstance(observable, service.Service):
-            self.save_service(observable)
-
-    @contextmanager
-    def disabled(self):
-        self.enabled, prev_enabled = False, self.enabled
-        try:
-            yield
-        finally:
-            self.enabled = prev_enabled
-    </code></pre>
-    </section>
-</section>
-
-
-<section id="slide_state_machine">
-    <section>
-        <h2>State Machine</h2>
-
-        <h3>Exhibit A</h3>
-        <pre class="fragment"><code>
-    def mark_success(self):
-        self.exit_status = 0
-        self.end_time = timeutils.current_time()
-        self.machine.transition('success')
-        </code></pre>
-
-        <pre class="fragment"><code>
-    def success(self):
-        if self.machine.transition('success'):
-            self.exit_status = 0
-            self.end_time    = timeutils.current_time()
-            return True
-        </code></pre>
-    </section>
-
-    <section>
-        <h3>Exhibit B</h3>
-        <pre><code>
-def start(self):
-    if not (self.is_scheduled or self.is_queued):
-        raise InvalidStartStateError("Not scheduled")
-        </code></pre>
-
-        <pre class="fragment"><code>
-def start(self):
-    if not self.machine.check('start'):
-        raise InvalidStartStateError(self.state)
-    ...
-        </code></pre>        
-
-    </section>
-</section>
-
-<section>
-    <section>
-        <h2>Complexity</h2>
-        <pre><code>
-def next_to_finish(self, node=None):
-    """Useful for getting the currently running job run or next 
-    queued/schedule job run.
-    """
-    def choose(prev, next):
-        return (prev if (prev and prev.is_running) 
-            or (node and next.node != node)
-            or next.is_success 
-            or next.is_failure 
-            or next.is_cancelled 
-            or next.is_unknown 
-            else next)
-
-    return reduce(choose, self.runs, None)
-        </code></pre>
-        <pre class="fragment"><code>
-choose(None, choose(run[0], choose(run[1], choose(run[n-1], run[n]))))
-        </code></pre>
-    </section>
-
-    <section>
-        <pre><code>        
-def get_next_to_finish(self, node=None):
-    """Return the most recent run which is either running or scheduled
-    """
-    def choose(run):
-        if node and run.node != node:
-            return False
-        if run.is_running or run.is_scheduled:
-            return run
-    return self._get_run_using(choose)
-        </code></pre>
-        <pre class="fragment"><code>
-def _get_run_using(self, func, reverse=False):
-    try:
-        return self._get_runs_using(func, reverse).next()
-    except StopIteration:
-        return None
-
-def _get_runs_using(self, func, reverse=False):
-    job_runs = self.runs if not reverse else reversed(self.runs)
-    return itertools.ifilter(func, job_runs)
-        </code></pre>
-    </section>
-</section>
-
-<section>
-        <h2>Tests</h2>
-        <pre class="fragment"><code>
-class ConstantScheduler(object):
-
-    def next_run_time(self, _):
-        return timeutils.current_time()
-        </code></pre>
-
-        <pre class="fragment"><code>
-class ConstantSchedulerTest(TestCase):
-    @setup
-    def build_scheduler(self):
-        self.test_dir = tempfile.mkdtemp()
-        self.scheduler = scheduler.ConstantScheduler()
-        self.action = action.Action("Test Action")
-        self.action.command = "Test Command"
-        self.job = job.Job("Test Job", self.action)
-        self.job.node_pool = turtle.Turtle()
-        self.job.output_path = self.test_dir
-        self.job.scheduler = self.scheduler
-        self.action.job = self.job
-
-    ...
-        </code></pre>
-</section>
-
-<section class="question_slide">
-    <h4>cleanup</h4>
-</section>
-
-<section id="slide_design_patterns" class="question_slide">
-    <h2>Design Patterns!</h2>
-    <ul class="fragment">
-        <li>Factory</li>
-        <li>Singleton</li>
-        <li>Composite</li>
-        <li>Decorator</li>
-        <li>Collection</li>
-        <li>Proxy</li>
-        <li>Command</li>
-        <li>Observer</li>
-        <li>Template</li>
-    </ul>
-    <img class="fragment" src="imgs/gang_of_four.jpg" />    
-</section>
-
-<section>
-    <h2>Observer/Observable</h2>
+    <h2>Observer</h2>
     <pre><code contenteditable>
 class Observable(object):
 
@@ -686,7 +167,7 @@ class Observer(object):
 <section>
     <h2>Factory</h2>
 
-    <pre class="fragment"><code contenteditable>
+    <pre><code contenteditable>
 ...
 
     @classmethod
@@ -717,8 +198,8 @@ class Observer(object):
 <section id="slide_collections">
     <section>
         <h2>Collections</h2>
-        <img class="fragment" src="imgs/collection_uml.png" />
-        <pre class="fragment"><code>
+        <img src="imgs/collection_uml.png" />
+        <pre><code>
 class JobRunCollection(object):
     ...
 
@@ -802,64 +283,8 @@ class ValidateNode(Validator):
 </section>
 </section>
 
-
-<section id="slide_whats_the_deal" class="question_slide">
-    <h4>So what's the deal?</h2>
-    <h4 class="fragment">Code should be beautiful!</h4>
-    <h4 class="fragment">Not convinced?</h4>
-</section>
-
-<section class="question_slide">
-    <h4>beautiful?</h4>
-    <blockquote class="fragment" cite="http://en.wikipedia.org/wiki/Beauty">
-    <strong>Beauty</strong> ... is a characteristic of [code] that provides a perceptual experience of pleasure or satisfaction.
-    </blockquote>
-    <p class="quote_credit">
-        wikipedia.org
-    </p>
-
-</section>
-
 <section>
-    <h2>Syntax Highlighting</h2>
-</section>
-
-<section>
-    <h2>Warnings are Errors</h2>
-    <img src="imgs/warning.png" />
-</section>
-
-<section>
-    <h2>Zen of Python</h2>
-    <pre id="zen">
->>> import this
-The Zen of Python, by Tim Peters
-
-<strong>Beautiful is better</strong> than ugly.
-Explicit is better than implicit.
-Simple is better than complex.
-Complex is better than complicated.
-Flat is better than nested.
-Sparse is better than dense.
-Readability counts.
-...</pre>
-</section>
-
-<section id="analogy">
-    <section>
-        <h2>Code in Motion</h2>
-        <img class="fragment" src="imgs/shark.jpg" />
-
-    </section>
-    <section>
-        <h3>over time...</h3>
-        <img src="imgs/quality_graph.png" />
-    </section>
-</section>
-
-<section class="question_slide">
-    <h4>So how do we make code beautiful?</h4>
-    <!-- ACM issue 12/2011 art in the science -->
+    <h4>Style</h4>
 </section>
 
 <section class="howto">
@@ -869,9 +294,9 @@ Readability counts.
     <!-- program as a table -->
     <!-- max 80 character lines -->
     <ul>
-        <li class="fragment">Alignment and indentation</li>
-        <li class="fragment">Max characters per line</li>
-        <li class="fragment">Guard statements and flow</li>
+        <li >Alignment and indentation</li>
+        <li >Max characters per line</li>
+        <li >Guard statements and flow</li>
     </ul>
 </section>
 
@@ -880,10 +305,10 @@ Readability counts.
     <h2>Naming</h2>
     <!-- design patterns come in here a lot -->
     <ul>
-        <li class="fragment">English is your guide</li>
-        <li class="fragment">Contextual naming</li>
-        <li class="fragment">Expected names</li>
-        <li class="fragment">Appropriate specificity</li>
+        <li >English as a guide</li>
+        <li >Contextual naming</li>
+        <li >Expected names</li>
+        <li >Appropriate specificity</li>
     </ul>
 </section>
 
@@ -892,31 +317,8 @@ Readability counts.
     <h2>Code over Comments</h2>
     <!-- self documenting code, comments can lie, etc -->
     <ul>
-        <li class="fragment">Self documented is better then explained</li>
-        <li class="fragment">Comments are not an excuse for complexity</li>
-    </ul>
-</section>
-
-
-<section class="howto">
-    <h2>Design Patterns</h2>
-    <!-- code to an interface -->
-    <ul>
-        <li class="fragment">Code to an interface</li>
-        <li class="fragment">Abstraction layers</li>
-        <li class="fragment">Reduce complexity</li>
-        <li class="fragment">It's been done before</li>
-</section>
-
-
-<section class="howto">
-    <h2>Tests</h2>
-    <!-- before code, synchronously -->
-    <ul>
-        <li class="fragment">Before is better then after</li>
-        <li class="fragment">Many unit tests for each layer</li>
-        <li class="fragment">Fewer integration tests</li>
-        <li class="fragment">They can teach you things</li>
+        <li >Self documented is better then explained</li>
+        <li >Comments do not excuse complications</li>
     </ul>
 </section>
 
@@ -925,44 +327,44 @@ Readability counts.
     <h2>Keep it short</h2>
     <!-- portability, maintainability, understanding -->
     <ul>
-        <li class="fragment">Short functions, classes, modules</li>
-        <li class="fragment">Reusable</li>
-        <li class="fragment">Maintainable</li>
+        <li >Short functions, classes, modules</li>
+        <li >Reusable</li>
+        <li >Maintainable</li>
     </ul>
 </section>
 
 
-<section class="question_slide">
-    <h4>Read the code!</h4>
+<section class="howto">
+    <h2>General Practices</h2>
+    <ul>
+        <li >Code to an interface</li>
+        <li >Abstraction layers</li>
+        <li >Reduce complexity</li>
+        <li >Test quality</li>
+    </ul>
 </section>
 
-
-<section class="question_slide">
-    <h4>... and back to Tron</h4>
-</section>
 
 <section>
     <h2>Tron of the future</h2>
     <ul>
-        <li class="fragment">Segmented configuration</li>
+        <li>Always more refactoring</li>
+        <li>Segmented configuration</li>
         <!-- dashboard, cli -->
-        <li class="fragment">Better end-user tools</li>
-        <li class="fragment">Client Daemons</li>
-        <li class="fragment">High Availability</li>
+        <li>More user friendly</li>
+        <li>Client daemons</li>
+        <li>High availability</li>
     </ul>
 </section>
 
 
-<section class="question_slide">
-    <h4>... a stable release</h4>
-    <h4 class="fragment">and greater adoption</h4>
+<section id="slide_more_about">
+    <h2>More about Tron</h2>
+    <ul>
+        <li>github.com/Yelp/Tron</li>
+        <li>packages.python.org/tron</li>
+    </ul>
 </section>
-
-<section>
-    <h2>Thanks!</h2>
-    <!-- TODO: sjohnson++ -->
-</section>
-
 
 <section id="slide_end">
 	<h1>The End</h1>

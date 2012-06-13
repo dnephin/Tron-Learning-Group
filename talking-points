@@ -1,24 +1,21 @@
 
-Intro
-======
 Hey,
 my name is
 infra team
 i was encourage
 the story of tron
-how many people have heard of tron
+how many people have heard of Tron
 
 Tron is a system we use here at yelp
 for running batches and services
-started here at yelp, by the infra team circa 2009
+created here, by the infra team circa 2009
 cron was no longer meeting our requirements
 the plan was to build
 using twisted and yaml
 
 fast forward a couple years
-yelp is now heavily using tron for batches and services
-it's an open source project, and is used at a couple other places
-
+yelp is now widely used for batches and services
+it's an open source project, and it has a couple users outside of yelp 
 my story with Tron starts about 4 months ago
 i had recently joined the infra team
 and I heard that Tron was going to be moving 
@@ -27,7 +24,6 @@ back under the infra umbrella
 at the time, 
 I felt like the general concensus
 was that Tron needed a lot of work
-
 For the most part it had been working
 there were definitely some rough edges,
 some parts needed to be completely refactored
@@ -38,13 +34,11 @@ tron was open source
 it needed a lot of work
 and it was an opporunity to refactor code into design patterns
 all of this sounded great to me
-
 so i did a bit of digging,
 i met with some people who had more experience with tron
 and got an idea for what the major blockers were
 
 I learned that Tron had a few components
-
 
 a job scheduler
 at its core, the same essential idea as cron
@@ -56,11 +50,7 @@ so that if a new one starts before the previous one ends
 it can either cancel or queue the new run
 in the job scheduling world
 a Job is a collection of actions
-with a schedule
-a JobRun is a single run of the job
-an action is a process that will be run
-and an action run is , ya you get it
-
+an action identifies the process to run
 
 service monitor
 starts and stop services, daemons
@@ -68,7 +58,6 @@ each service can be configured to run on any number of remote machines
 each service can also have multiple instances
 when a service fails, it can be configured to restart
 and tron will run the daemon again
-
 
 configuration management
 loads a yaml config file filled with nodes, jobs and services
@@ -91,16 +80,11 @@ when no jobs or services failed, and tron wasn't restarted everything was mostly
 so I got to work
 my objectives was/is no different then any other project I work on
 I'd try to leave the code base in a better condition then when i got there
-but what does that really mean?
 i want the code to be more enjoyable to work with
 - reliable test that run fast, and have good coverage
 - code that is easy to read and understand
-	- design patterns
-	- style
-a lot of time that means shrinking the sizes of classes and functions
 smaller blocks are easier to understand
-
-i wanted Tron to be more stable and easier to administrate
+i wanted Tron to be more stable and easier to user and administrate
 
 so what did i do, and how did i do it?
 i started refactoring things into smaller classes
@@ -109,9 +93,10 @@ for me, design patterns are the most interesting part of programming
 i know there is not always a concensous on design patterns
 i've read some people say that they make code overly complex
 in my experience they've always made things easier to understand
-i wonder if maybe using a design pattern incorrectly maybe does more harm then good
-but i really feel using one correctly goes a long way to better scrutured code
-
+i think there is definitely a wrong way to use patterns
+trying to make your code fit into a pattern is the wrong approach
+the idea is to find the pattern that use code is using anyways
+and formalize it
 
 i think that a lot of people see design patterns as theory
 but i think in reality they aren't derived from acedemia
@@ -120,36 +105,90 @@ design patterns come from experience
 they're codified over many years by experienced programmers
 this allows us to take advantage of all their experience
 so we don't have to repeat the same mistakes they did
-
-
 I won't bore you with every pattern I've used in Tron
 but let's take a look at a couple key patterns
-	- factory
-	- observer
-	- collection
-	- template
+
+observer
+behavioural pattern
+very useful with event loops, which is why tron uses it
+there are two classes which colaborate
+the observer is like the parent object
+it needs to know when the child changes it's state
+but it shouldn't have to ask
+so it calls watch, with the child as an argument
+the observable is the child
+it allows observers to attach to it
+and sends a notify when it's state changes
+
+factory
+is a creational pattern
+it's great for constructing objects which have many requirements
+allowing you to keep your constructor simple
+makes testing these classes a lot easier, way less patching
+reduces coupling between when you need to build one object from another
+
+collection
+i first saw this pattern in backbone.js
+it's useful when you have a data structure of objects
+and you want to be able to operate on all the objects at once
+or possible filter the data structure in different ways
+very useful in tron because there are many collections of objects
+
+template
+common behavioural pattern
+this is used in a few places in tron
+it's also the central pattern for MDBatch and ForEach
+the idea is to outline the template of an operation in the base class
+and provide extension points for each step
+then subclasses can override each extension point 
+to customize the operation
+this example is from the configuration validation
 
 
 in addition to design patterns, I think style is important
-style increases readability, think syntax highlighting
+style increases readability, 
+think syntax highlighting
 it makes the code base more inviting,
 which in turn makes it more enjoyable to work with
-which leads to quality more work being done
+which leads to more quality work being done
 so what are some style issues I like to address
-	- whitesace and alignment
-	- naming
-	- code over comments
-	- keep it short
 
 
-then there are a few things, taht don't really fit into style
+whitesace and structure
+...
+max character per lines is still important
+i had a prof which claimed that if you're going over...
+you're doing something wrong
+too much indentation
+your naming is too verbose
+an exception is error messages and long strings
+guard statements and flow
+code doesn't have to look like an arrow, 
+guard statements make it much easier to reason about
+
+naming
+
+code over comments
+comments are primarely useful for creating API docs
+code should self document
+
+keep it short
+short code is more re-usable because it will only do a single thing
+code that does more then a single thing is a lot less likely to be re-used
+short code is easier to understand and reason about
+
+
+then there are a few things, that don't really fit into style
 or design patterns
 but i think are key guidelines for clean code
-	- code to an interface
-	- abstraction layers
-	- reduce complexity
-
-
+- code to an interface
+a clean interface will result in a cleaner implementation
+implementation is easier to change,
+interface is a lot more work
+- abstraction layers
+a great way to make code less complicated
+each layer has a single concern
+- reduce complexity
 i also think test quality is very important
 fast tests
 test each abstraction layer indepedently

@@ -34,6 +34,12 @@
 	}
 }
 
+#slide_more_about {
+    li {
+        list-style: none;
+        line-height: 2em;
+    }
+}
 
 @tron: #BFA130;
 
