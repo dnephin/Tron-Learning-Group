@@ -1,0 +1,164 @@
+
+Intro
+======
+Hey,
+my name is
+infra team
+i was encourage
+the story of tron
+how many people have heard of tron
+
+Tron is a system we use here at yelp
+for running batches and services
+started here at yelp, by the infra team circa 2009
+cron was no longer meeting our requirements
+the plan was to build
+using twisted and yaml
+
+fast forward a couple years
+yelp is now heavily using tron for batches and services
+it's an open source project, and is used at a couple other places
+
+my story with Tron starts about 4 months ago
+i had recently joined the infra team
+and I heard that Tron was going to be moving 
+back under the infra umbrella
+
+at the time, 
+I felt like the general concensus
+was that Tron needed a lot of work
+
+For the most part it had been working
+there were definitely some rough edges,
+some parts needed to be completely refactored
+
+I was excited to hear this
+I eagerly volunteered to work on the project
+tron was open source
+it needed a lot of work
+and it was an opporunity to refactor code into design patterns
+all of this sounded great to me
+
+so i did a bit of digging,
+i met with some people who had more experience with tron
+and got an idea for what the major blockers were
+
+I learned that Tron had a few components
+
+
+a job scheduler
+at its core, the same essential idea as cron
+letting you schedule a time for a process to run
+it also allows you to run the job on a remote machine
+has dependency management
+and keeps track of each run
+so that if a new one starts before the previous one ends
+it can either cancel or queue the new run
+in the job scheduling world
+a Job is a collection of actions
+with a schedule
+a JobRun is a single run of the job
+an action is a process that will be run
+and an action run is , ya you get it
+
+
+service monitor
+starts and stop services, daemons
+each service can be configured to run on any number of remote machines
+each service can also have multiple instances
+when a service fails, it can be configured to restart
+and tron will run the daemon again
+
+
+configuration management
+loads a yaml config file filled with nodes, jobs and services
+parses the config, and sets up the tron daemon
+and there was a command line tool called tronfig 
+to upload new configs while tron was running
+
+
+state serialization
+api for tron commands (tronview, tronctl, tronfig)
+
+
+so what was causing problems?
+when no jobs or services failed, and tron wasn't restarted everything was mostly fine
+- restarting tron for upgrades and failing jobs could cause tron to get into weird states
+- the configuration was a little verbose
+- and would complain when new configurations were pushed
+
+
+so I got to work
+my objectives was/is no different then any other project I work on
+I'd try to leave the code base in a better condition then when i got there
+but what does that really mean?
+i want the code to be more enjoyable to work with
+- reliable test that run fast, and have good coverage
+- code that is easy to read and understand
+	- design patterns
+	- style
+a lot of time that means shrinking the sizes of classes and functions
+smaller blocks are easier to understand
+
+i wanted Tron to be more stable and easier to administrate
+
+so what did i do, and how did i do it?
+i started refactoring things into smaller classes
+and into design patterns
+for me, design patterns are the most interesting part of programming
+i know there is not always a concensous on design patterns
+i've read some people say that they make code overly complex
+in my experience they've always made things easier to understand
+i wonder if maybe using a design pattern incorrectly maybe does more harm then good
+but i really feel using one correctly goes a long way to better scrutured code
+
+
+i think that a lot of people see design patterns as theory
+but i think in reality they aren't derived from acedemia
+which is maybe why they aren't tought very much in school
+design patterns come from experience
+they're codified over many years by experienced programmers
+this allows us to take advantage of all their experience
+so we don't have to repeat the same mistakes they did
+
+
+I won't bore you with every pattern I've used in Tron
+but let's take a look at a couple key patterns
+	- factory
+	- observer
+	- collection
+	- template
+
+
+in addition to design patterns, I think style is important
+style increases readability, think syntax highlighting
+it makes the code base more inviting,
+which in turn makes it more enjoyable to work with
+which leads to quality more work being done
+so what are some style issues I like to address
+	- whitesace and alignment
+	- naming
+	- code over comments
+	- keep it short
+
+
+then there are a few things, taht don't really fit into style
+or design patterns
+but i think are key guidelines for clean code
+	- code to an interface
+	- abstraction layers
+	- reduce complexity
+
+
+i also think test quality is very important
+fast tests
+test each abstraction layer indepedently
+sumeet has already covered all this in an earlier learning group
+
+
+so what is next for Tron?
+- always more refactoring
+- the next release
+- future features
+
+Where to learn more
