@@ -34,56 +34,120 @@
 <div class="slides">
 <section id="slide_title">
 	<h1>Tron</h1>
-	<h3 class="fragment">Design Patterns</h3>
-    <h4 class="fragment">and why code should be beautiful</h4>
 </section>
 
-<section id="slide_image_grid">
-    <div class="container">
-        <!-- grid -->
-        <div><p>Tron</p></div>
-        <div><img src="imgs/yelp.png" />2009</div>
-        
-        <div>Apache License 2.0</div>
-
-        <div><strong>~15,000 lines of code</strong></div>
-        <div><img src="imgs/python_black.png" /></div>
-        <div>
-            <ul>
-                <li>Twisted</li>
-                <li>YAML</li>
-            </ul>
-        </div>
-
-        <div><p>github.com/Yelp/Tron</p></div>
-    </div>
+<section id="slide_intro">
+    <h2>In the beginning</h2>
+    <img src="imgs/yelp.png" />
+    <ul>
+        <li>infra 2009</li>
+        <li>twisted and yaml</li>
+    </ul>
 </section>
 
+<section>
+    <h4>Fast forward</h4>
+</section>
 
-<section id="slide_description">
-     <p>Tron is a <span>centralized system</span><br /> for managing <span>periodic batch processes</span> and <span>services</span> across<br /> a cluster.</p>
+<section>
+    <h2>State of the Tron</h2>
+    <ul>
+        <li>open source</li>
+        <li>homeless</li>
+        <li>needed lots of work</li>
+        <li>opportunity to refactor</li>
+    </ul>
+    <h4>Sweet!</h4>
+</section>
+
+<section>
+    <h4>Components</h4>
 </section>
 
 <section id="slide_batchs">
-	<h2>Batch Processes</h2>
-    <!-- TODO: icons instead of lists -->
-    <!-- Job/JobRun/Action -->
-	<ul>
+    <h2>Job Scheduler</h2>
+    <ul>
         <li>scheduling</li>
         <li>execute on remote machines</li>
         <li>dependency management</li>
         <li>run history</li>
     </ul>
+    <!-- TODO: diagram Job/Action-->
 </section>
 
+
 <section id="slide_services">
-	<h2>Services</h2>
+    <h2>Service Monitor</h2>
     <ul>
-        <li>start/stop services</li>
-        <li>execute on remote machines</li>
+        <li>start and stop services</li>
+        <li>execute on many remote machines</li>
+        <li>run multiple instances</li>
         <li>monitor and restart on failure</li>
     </ul>
 </section>
+
+
+<section>
+    <h2>Configuration Management</h2>
+    <ul>
+        <li>load yaml</li>
+        <li>parse configuration</li>
+        <li>setup tron daemon</li>
+        <li><span class="command">tronfig</span></li>
+    </ul>
+</section>
+
+<section>
+    <h2>Also</h2>
+    <ul>
+        <li>state serialization</li>
+        <li>REST, json API</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Why!?!?</h2>
+    <ul>
+        <li>strange failure states</li>
+        <li>verbose configuration</li>
+        <li>troubles re-configuring</li>
+    </ul>
+</section>
+
+
+<section>
+    <h2>Goals</h2>
+    <ul>
+        <li>fast, reliable tests</li>
+        <li>cleaner</li>
+        <li>overall more enjoyable</li>
+        <li>stable</li>
+    </ul>
+</section>
+
+<section>
+    <h4>What to do...</h4>
+</section>
+
+<section>
+    <h2></h2>
+    <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</section>
+
+
+<!-- template -->
+<section>
+    <h2></h2>
+    <ul>
+        <li></li>
+    </ul>
+</section>
+
+
 
 <section id="slide_system">
     <h2>Centralized system</h2>

@@ -2,11 +2,36 @@
 
 .reveal section {
     ul {
-        margin-top: 100px;
         li {
             line-height: 1.5em;
         }
     }
+    h2 {
+    	margin-bottom: 100px;
+    }
+	h4 {
+		margin-top: 90px;
+		font-size: 80px;
+		line-height: 1.2em;
+	}
+	blockquote {
+		margin: 100px auto;
+		font-family: 'Port Lligat Sans';
+	}    
+}
+
+.command {
+	color: #888;
+	font-family: monospace;
+	font-style: italic;
+}
+
+
+#slide_intro {
+	img {
+		margin: auto;
+		display: block;
+	}
 }
 
 
@@ -27,59 +52,6 @@
     }
 }
 
-
-#slide_image_grid {
-	.container {
-		float: left;
-		margin: 0 60px;
-		div {
-			width: 220px;
-			margin: 10px;
-			height: 180px;
-			background: transparent;
-			float: left;
-			padding: 10px;
-			color: white;
-			font-weight: bold;
-			text-align: left;
-			font-size: 40px;
-			font-family: 'bitstream vera sans';
-			line-height: 1.2em;			
-		}
-		img {
-			border: 0;
-			margin: auto auto;
-			box-shadow: 0;
-			background: transparent;
-		}
-		div:nth-child(1) {
-			p {
-				padding-top: 65px;
-				font-family: 'Changa One';
-				color: @tron;
-				font-size: 50px;
-				letter-spacing: 0.15em;
-			}
-		}
-		div:nth-child(5) {
-			text-align: center;
-			img {
-				margin-top: 30px;
-			}
-
-		}
-		div:nth-child(6) ul {
-			margin-top: 30px;
-			list-style: none;
-		}
-		div:nth-child(7) {
-			p {
-				margin-top: 50px;
-				font-family: 'Open Sans';
-			}
-		}
-	}
-}
 
 /*http://colorschemedesigner.com/#3u322w0w0w0w0*/
 @system_color:  #64A8D1;
@@ -187,17 +159,6 @@
 	}
 }
 
-.question_slide {
-	h4 {
-		margin-top: 90px;
-		font-size: 80px;
-		line-height: 1.2em;
-	}
-	blockquote {
-		margin: 100px auto;
-		font-family: 'Port Lligat Sans';
-	}
-}
 
 .howto {
     h2 {
@@ -207,7 +168,6 @@
 
 .quote_credit {
 	width: 85%;
-	font-family: 'bitstream vera sans mono';
 	text-align: right;
 }
 
