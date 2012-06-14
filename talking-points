@@ -27,11 +27,9 @@ back under the infra umbrella
 at the time, 
 I felt like the general concensus
 was that Tron needed a lot of work
-For the most part it had been working
+For the most part it was functioning properly
 there were definitely some rough edges,
 some parts needed to be completely refactored
-
-
 I was excited to hear this
 I eagerly volunteered to work on the project
 tron was open source
@@ -54,7 +52,7 @@ has dependency management
 and keeps track of each run
 so that if a new one starts before the previous one ends
 it can either cancel or queue the new run
-in the job scheduling world
+in Tron terminology
 a Job is a collection of actions
 an action identifies the process to run
 
@@ -99,7 +97,7 @@ so what did i do, and how did i do it?
 i started refactoring things into smaller classes
 and into design patterns
 for me, design patterns are the most interesting part of programming
-i know there is not always a concensous on design patterns
+i know there is not really a concensous on the benefit of design patterns
 i've read some people say that they make code overly complex
 in my experience they've always made things easier to understand
 i think there is definitely a wrong way to use patterns
@@ -108,12 +106,8 @@ the idea is to find the pattern that use code is using anyways
 and formalize it
 
 
-i think that a lot of people see design patterns as theory
-but i think in reality they aren't derived from acedemia
-which is maybe why they aren't tought very much in school
-design patterns come from experience
-they're codified over many years by experienced programmers
-this allows us to take advantage of all their experience
+design patterns come from practical experience
+they're codified over many years by veteran programmers
 so we don't have to repeat the same mistakes they did
 I won't bore you with every pattern I've used in Tron
 but let's take a look at a couple key patterns
@@ -198,6 +192,7 @@ should have a specific name
 code over comments
 comments are primarely useful for creating API docs
 code should self document
+docstrings and module headers are an exception
 
 
 keep it short

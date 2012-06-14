@@ -158,7 +158,7 @@ class Observer(object):
     def watch(self, observable, event=True):
         observable.attach(event, self)
 
-    def handler(self, observable, event):
+    def update(self, observable, event):
         pass
     </code></pre>
 </section>
