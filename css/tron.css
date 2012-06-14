@@ -44,7 +44,6 @@
     }
 }
 
-@tron: #FF9A40;
 
 #slide_title {
 	h1 {
@@ -61,12 +60,13 @@
     }
 }
 
+@tron: #FFC340;
 
-/*http://colorschemedesigner.com/#3u322w0w0w0w0*/
-@red:  #BF3A30;
-@orange:   #FF7800;
-@blue: #028E9B;
-@green: #00C322;
+/*http://colorschemedesigner.com/#3i41Ww0w0w0w0*/
+@red:      #33CCCC;
+@orange:   #6D87D6;
+@blue:     #FFC340;
+@green:    #FF9640;
 
 .slides section:nth-of-type(4n+2) h2 {
 	color: @red;
