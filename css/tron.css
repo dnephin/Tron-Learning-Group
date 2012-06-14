@@ -60,25 +60,26 @@
     }
 }
 
-@tron: #FFC340;
 
 /*http://colorschemedesigner.com/#3i41Ww0w0w0w0*/
-@red:      #33CCCC;
-@orange:   #6D87D6;
-@blue:     #FFC340;
-@green:    #FF9640;
+@first:     #7AE969;
+@second:    #6D87D6;
+@third:     #FFC340;
+@forth:     #FF9640;
 
-.slides section:nth-of-type(4n+2) h2 {
-	color: @red;
-}
-.slides>section:nth-of-type(4n+3) h2 {
-	color: @orange;
-}
-.slides>section:nth-of-type(4n) h2 {
-	color: @blue;
+@tron: @forth;
+
+.slides section:nth-of-type(4n) h2 {
+	color: @first;
 }
 .slides>section:nth-of-type(4n+1) h2 {
-	color: @green;
+	color: @second;
+}
+.slides>section:nth-of-type(4n+2) h2 {
+	color: @third;
+}
+.slides>section:nth-of-type(4n+3) h2 {
+	color: @forth;
 }
 
 #slide_batchs {

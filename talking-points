@@ -25,7 +25,7 @@ back under the infra umbrella
 
 
 at the time, 
-I felt like the general concensus
+I felt like the general consensus
 was that Tron needed a lot of work
 For the most part it was functioning properly
 there were definitely some rough edges,
@@ -34,7 +34,7 @@ I was excited to hear this
 I eagerly volunteered to work on the project
 tron was open source
 it needed a lot of work
-and it was an opporunity to refactor code into design patterns
+and it was an opportunity to refactor code into design patterns
 all of this sounded great to me
 so i did a bit of digging,
 i met with some people who had more experience with tron
@@ -97,7 +97,7 @@ so what did i do, and how did i do it?
 i started refactoring things into smaller classes
 and into design patterns
 for me, design patterns are the most interesting part of programming
-i know there is not really a concensous on the benefit of design patterns
+i know there is not really a consensus on the benefit of design patterns
 i've read some people say that they make code overly complex
 in my experience they've always made things easier to understand
 i think there is definitely a wrong way to use patterns
@@ -116,7 +116,7 @@ but let's take a look at a couple key patterns
 observer
 behavioural pattern
 very useful with event loops, which is why tron uses it
-there are two classes which colaborate
+there are two classes which collaborate
 the observer is like the parent object
 it needs to know when the child changes it's state
 but it shouldn't have to ask
@@ -162,7 +162,7 @@ which leads to more quality work being done
 so what are some style issues I like to address
 
 
-whitesace and structure
+whitespace and structure
 ...
 max character per lines is still important
 i had a prof which claimed that if you're going over...
@@ -190,7 +190,7 @@ should have a specific name
 
 
 code over comments
-comments are primarely useful for creating API docs
+comments are primarily useful for creating API docs
 code should self document
 docstrings and module headers are an exception
 
@@ -214,7 +214,7 @@ each layer has a single concern
 - reduce complexity
 i also think test quality is very important
 fast tests
-test each abstraction layer indepedently
+test each abstraction layer independently
 sumeet has already covered all this in an earlier learning group
 
 
