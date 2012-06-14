@@ -7,7 +7,7 @@
         }
     }
     h2 {
-    	margin-bottom: 100px;
+    	margin-bottom: 50px;
     }
 	h4 {
 		margin-top: 90px;
@@ -18,6 +18,9 @@
 		margin: 100px auto;
 		font-family: 'Port Lligat Sans';
 	}    
+	ul {
+		margin-top: 30px;
+	}
 }
 
 .command {
@@ -41,7 +44,7 @@
     }
 }
 
-@tron: #BFA130;
+@tron: #FF9A40;
 
 #slide_title {
 	h1 {
@@ -60,139 +63,46 @@
 
 
 /*http://colorschemedesigner.com/#3u322w0w0w0w0*/
-@system_color:  #64A8D1;
-@batch_color:   #FFC900;
-@service_color: #FF4940;
+@red:  #BF3A30;
+@orange:   #FF7800;
+@blue: #028E9B;
+@green: #00C322;
 
-#slide_description {
-	 p {
-		width: 80%;
-		margin: 150px auto 0;
-		font-size: 48px;
-		line-height: 1.2em;
-		text-align: left;
-	}
-
-	p.highlight {
-		-webkit-transition: 2s;
-		span {
-			font-weight: bold;
-		}
-		span:nth-child(1) {
-			color: @system_color;
-		}
-		span:nth-child(3) {
-			color: @batch_color;
-		}
-		span:nth-child(4) {
-			color: @service_color;
-		}
-	}
-
+.slides section:nth-of-type(4n+2) h2 {
+	color: @red;
+}
+.slides>section:nth-of-type(4n+3) h2 {
+	color: @orange;
+}
+.slides>section:nth-of-type(4n) h2 {
+	color: @blue;
+}
+.slides>section:nth-of-type(4n+1) h2 {
+	color: @green;
 }
 
 #slide_batchs {
 	h2 {
-		color: @batch_color;
 	}
 }
 
 #slide_services {
 	h2 {
-		color: @service_color;
 	}	
 }
 
 #slide_system {
 	h2 {
-		color: @system_color;
+	}
+}
+
+#slide_collections {
+	img {
+		margin: 0;
 	}
 }
 
 @commands: #3D9AD1;
-
-#slide_commands {
-	h3 {
-		color: @commands;
-	}
-	h3, p {
-		text-align: left;
-	}
-	pre.output {
-		background: #222;
-		padding: 30px;
-		width: 80%;
-		strong {
-			color: #FF0D00;
-		}
-		.fail {
-			color: red;
-		}
-		.header {
-			background: #555;
-		}
-		.dates {
-			color: #777;
-		}
-	}
-}
-
-@exhibit: #FFE173;
-
-#slide_state_machine {
-	h3 {
-		color: @exhibit;
-	}
-}
-
-#zen {
-	background: #222;
-	padding: 30px 100px;
-	font-size: 22px;
-	width: auto;
-    strong {
-        color: @exhibit;
-    }
-}
-
-#analogy {
-}
-
-#slide_state_persistence {
-	pre {
-		max-height: 500px;
-		overflow: auto;
-	}
-}
-
-
-.howto {
-    h2 {
-        color: #64A8D1;
-    }
-}
-
-.quote_credit {
-	width: 85%;
-	text-align: right;
-}
-
-
-#slide_whats_the_deal {
-	h4 {
-		
-	}
-}
-
-#slide_design_patterns {
-	img {
-		margin: -100px 0 0 -100px;
-		-webkit-transform:rotate(-15deg);
-	}
-    ul {
-        margin: 0;
-    }
-}
 
 #slide_end {
 	h1 {
